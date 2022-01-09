@@ -1,5 +1,6 @@
 // async: 4, 1, 5, 2, 3
 // 如果這個檔案的執行在 只有一核心的電腦上的 node，有機會變成 4, 1, 2, 3, 5 嗎？
+// 不會？因為 event loop 總是等到 stack 為空才將 callback 放進去 ？
 async function test() {
     console.log(1);
 
