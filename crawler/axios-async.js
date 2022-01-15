@@ -5,7 +5,7 @@ const axios = require('axios').default;
 // Status: 200
 // Source: Network
 // Address: 122.147.34.152:443
-// Initiator: 
+// Initiator:
 // main.js:8:82719
 
 const request = {
@@ -16,19 +16,15 @@ const request = {
     stockNo: 2330,
     get url() {
         return `${this.domain}?resopnse=${this.type}&date=${this.year}${this.month}01&stockNo=${this.stockNo}&_=1631716312720`;
-    }
-}
-
-doAxios();
-
-async function doAxios () {
+    },
+}(async function () {
     try {
         const response = await axios.get(request.url);
         // console.log('status: ', response.status);
         // console.log('status-text: ', response.statusText);
         // console.log('header: ', response.headers);
-        console.log('data: ', response.data)
+        console.log('data: ', response.data);
     } catch (error) {
         console.error(error);
     }
-}
+})();
