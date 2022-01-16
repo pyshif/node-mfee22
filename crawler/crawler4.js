@@ -12,11 +12,15 @@ const moment = require('moment');
         };
         // 讀取檔案（股票代碼）
         request.stockNo = await fs.readFile('./stock.txt', 'utf-8');
-        const response = await axios.get(request.domain, {
-            params: {
-                query: request.stockNo,
-            },
-        });
+        // console.log(request.stockNo);
+        const response = {};
+        response.codeQuery = (
+            await axios.get(request.domain, {
+                params: {
+                    query: request.stockNo,
+                },
+            })
+        ).data;
         // API 回傳資料格式
         // {
         //     "query": "2330",
@@ -26,22 +30,25 @@ const moment = require('moment');
         //         "2330T\t台積丙"
         //     ]
         // }
+        console.log(response.codeQuery);
         if (
-            !response.data.suggestions ||
-            response.data.suggestions[0].includes('無符合')
+            !response.codeQuery.suggestions ||
+            response.codeQuery.suggestions[0].includes('無符合')
         ) {
             throw new Error('查無此表');
-        } else {
-            console.log(response.data);
         }
 
-        const stockName = response.data.suggestions[0].split('\t')[1];
-        console.log(stockName);
+        response.stockNo = response.codeQuery.suggestions[0].split('\t')[0];
+        response.stockName = response.codeQuery.suggestions[0].split('\t')[1];
+        console.log(response.stockNo);
+        console.log(response.stockName);
 
+        // request
         request.domain = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY';
         request.type = 'json';
         request.date = moment().format('YYYYMMDD');
-        const responseS = await axios.get(request.domain, {
+        // response
+        response.stock = await axios.get(request.domain, {
             params: {
                 response: 'json',
                 date: request.date,
@@ -49,7 +56,7 @@ const moment = require('moment');
             },
         });
 
-        console.log(responseS.data);
+        console.log(response.stock.data);
     } catch (e) {
         console.error(e);
     }
