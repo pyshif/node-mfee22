@@ -1,51 +1,55 @@
-const axios = require('axios');
-const { readFile } = require('fs/promises');
+const fs = require('fs/promises'); // 內建
+const axios = require('axios'); // 第三方
 const moment = require('moment');
+
 // 查詢股票名稱
 
 (async () => {
     try {
-        // 根據變數去抓取資料
-        // 從 stock.txt 中讀出檔案代碼
-        let stockNo = await readFile('stock.txt', 'utf-8');
-        // 抓取股票中文名稱，順便確認股票代碼是否存在
-        let queryStockName = await axios.get(
-            'https://www.twse.com.tw/zh/api/codeQuery',
-            {
-                params: {
-                    query: stockNo,
-                },
-            }
-        );
-        console.log(queryStockName.data);
-        // queryStockName.data.suggestions
+        const request = {
+            domain: 'https://www.twse.com.tw/zh/api/codeQuery',
+            stockNo: '',
+        };
+        // 讀取檔案（股票代碼）
+        request.stockNo = await fs.readFile('./stock.txt', 'utf-8');
+        const response = await axios.get(request.domain, {
+            params: {
+                query: request.stockNo,
+            },
+        });
+        // API 回傳資料格式
+        // {
+        //     "query": "2330",
+        //     "suggestions": [
+        //         "2330\t台積電",
+        //         "2330R\t台積甲",
+        //         "2330T\t台積丙"
+        //     ]
+        // }
         if (
-            !queryStockName.data.suggestions ||
-            queryStockName.data.suggestions[0] === '(無符合之代碼或名稱)'
+            !response.data.suggestions ||
+            response.data.suggestions[0].includes('無符合')
         ) {
-            throw new Error('查無此代表');
+            throw new Error('查無此表');
+        } else {
+            console.log(response.data);
         }
-        // 可以到這裡，表示有資料
-        let stockData = queryStockName.data.suggestions[0];
-        let stockDatas = stockData.split('\t');
-        let stockName = stockDatas[1];
 
-        let queryDate = moment().format('YYYYMMDD'); // 自動用今天的日期
+        const stockName = response.data.suggestions[0].split('\t')[1];
+        console.log(stockName);
 
-        let response = await axios.get(
-            'https://www.twse.com.tw/exchangeReport/STOCK_DAY',
-            {
-                // 這裡可以放一些設定
-                // params: 放 query string 的參數
-                params: {
-                    response: 'json',
-                    date: queryDate,
-                    stockNo,
-                },
-            }
-        );
+        request.domain = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY';
+        request.type = 'json';
+        request.date = moment().format('YYYYMMDD');
+        const responseS = await axios.get(request.domain, {
+            params: {
+                response: 'json',
+                date: request.date,
+                stockNo: request.stockNo,
+            },
+        });
 
-        // console.log(response.data);
+        console.log(responseS.data);
     } catch (e) {
         console.error(e);
     }
