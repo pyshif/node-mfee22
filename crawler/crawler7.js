@@ -22,7 +22,7 @@ const conn = require('./utils/db');
         }
 
         let stockName = converter.parseStockName(codeQuery);
-        console.log(stockName);
+        // console.log(stockName);
 
         // 儲存股票代碼與名稱進資料庫
         // Using prepared statements
@@ -32,7 +32,7 @@ const conn = require('./utils/db');
             stockNo,
             stockName
         );
-        console.log(insertStockName);
+        // console.log(insertStockName);
 
         let stockPrice = await twse.queryStockPrice(stockNo);
         // console.log(stockPrice);

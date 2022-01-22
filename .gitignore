@@ -3,3 +3,5 @@ node_modules
 # tmp.js
 tmp.*
 .vscode
+dist/*
+ashley
