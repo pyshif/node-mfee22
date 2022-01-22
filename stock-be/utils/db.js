@@ -14,3 +14,6 @@ const pool = mysql.createPool({
 });
 
 module.exports = pool.promise();
+
+// const promisePool = pool.promise();
+// const [rows, fields] = await promisePool.query(...);
